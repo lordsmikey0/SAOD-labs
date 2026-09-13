@@ -3,9 +3,6 @@
 # TASK 1
 def array_sum(a: list[int]) -> int:
     """Сумма элементов массива. Ожидаемая сложность: TODO (обосновать в отчёте)."""
-    # TODO: реализовать циклом
-
-    # Сложность: Q(N)
 
     if a is None:
         raise TypeError(f"array_sum excepts a list of integers. Got None instead")
@@ -27,9 +24,6 @@ def array_sum(a: list[int]) -> int:
 # TASK 2
 def array_max(a: list[int]) -> int:
     """Максимум массива (массив непуст). Ожидаемая сложность: TODO."""
-    # TODO: реализовать циклом
-
-    # Сложность: Q(N)
 
     if a is None:
         raise TypeError(f"array_sum excepts a list of integers. Got {type(a).__name__} instead.")
@@ -52,9 +46,6 @@ def array_max(a: list[int]) -> int:
 # TASK 3
 def count_equal_pairs(a: list[int]) -> int:
     """Число пар (i, j), i < j, таких что a[i] == a[j]. Ожидаемая сложность: TODO."""
-    # TODO: реализовать двойным циклом
-
-    # Сложность: Q(N^2)
 
     if a is None:
         raise TypeError(f"count_equal_pairs excepts a list of integers. Got None instead")
@@ -83,10 +74,6 @@ def binary_pow(x: int, n: int, mod: int | None = None) -> int:
 
     При заданном mod все умножения выполняются по модулю (результат x**n % mod).
     """
-    # TODO: реализовать через квадрирование; при mod применять % mod после
-    # каждого умножения
-
-    # Сложность O(log N)
     if x is None or n is None:
         raise TypeError(f"binary_pow expects 2 necessary variables - x and n as integers")
     if n < 0:
