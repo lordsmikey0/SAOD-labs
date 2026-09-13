@@ -1,0 +1,39 @@
+Данные варианта 10 (seed=40) из C:\Users\Alexey\PycharmProjects\data-structures-and-algorithms\data\generated
+self_check: OK
+
+array_sum:
+  n=   1000  t=0.000082 c
+  n=   3000  t=0.000256 c
+  n=  10000  t=0.000855 c
+  n=  30000  t=0.002569 c
+  n= 100000  t=0.008523 c
+
+array_max:
+  n=   1000  t=0.000073 c
+  n=   3000  t=0.000221 c
+  n=  10000  t=0.000741 c
+  n=  30000  t=0.002327 c
+  n= 100000  t=0.007571 c
+
+count_equal_pairs:
+  n=    500  t=0.010734 c
+  n=   1000  t=0.041613 c
+  n=   3000  t=0.365217 c
+  n=  10000  t=4.072181 c
+  n=  30000  t=37.121745 c
+
+binary_pow (по 20000 вызовов на точку, по модулю 1000000007):
+  n=     1000  log2(n)= 10.0  t=0.000002137 c
+  n=    10000  log2(n)= 13.3  t=0.000002722 c
+  n=   100000  log2(n)= 16.6  t=0.000003432 c
+  n=  1000000  log2(n)= 19.9  t=0.000004087 c
+  n= 10000000  log2(n)= 23.3  t=0.000004667 c
+
+Наклон в осях log-log (оценка показателя степени):
+  array_sum            1.006
+  array_max            1.011
+  count_equal_pairs    1.991
+
+Графики сохранены:
+  C:\Users\Alexey\PycharmProjects\data-structures-and-algorithms\M1-intro-and-basic-structures\attachments\lab01_loglog.png
+  C:\Users\Alexey\PycharmProjects\data-structures-and-algorithms\M1-intro-and-basic-structures\attachments\lab01_binary_pow.png
