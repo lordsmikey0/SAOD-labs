@@ -60,7 +60,7 @@ POW_CALLS = 20_000    # вызовов binary_pow на один замер: ин
 
 
 def array_sum(a: list[int]) -> int:
-    """Сумма элементов массива. Ожидаемая сложность: TODO (обосновать в отчёте)."""
+    """Сумма элементов массива. Ожидаемая сложность: O(n)"""
 
     if a is None:
         raise TypeError(f"array_sum excepts a list of integers. Got None instead")
@@ -80,7 +80,7 @@ def array_sum(a: list[int]) -> int:
 
 
 def array_max(a: list[int]) -> int:
-    """Максимум массива (массив непуст). Ожидаемая сложность: TODO."""
+    """Максимум массива (массив непуст). Ожидаемая сложность: O(n)"""
 
     if a is None:
         raise TypeError(f"array_sum excepts a list of integers. Got {type(a).__name__} instead.")
@@ -101,7 +101,7 @@ def array_max(a: list[int]) -> int:
 
 
 def count_equal_pairs(a: list[int]) -> int:
-    """Число пар (i, j), i < j, таких что a[i] == a[j]. Ожидаемая сложность: TODO."""
+    """Число пар (i, j), i < j, таких что a[i] == a[j]. Ожидаемая сложность: O(n^2)"""
 
     if a is None:
         raise TypeError(f"count_equal_pairs excepts a list of integers. Got None instead")
@@ -125,8 +125,7 @@ def count_equal_pairs(a: list[int]) -> int:
 
 
 def binary_pow(x: int, n: int, mod: int | None = None) -> int:
-    """Бинарное возведение в степень, n >= 0. Ожидаемая сложность: TODO.
-
+    """Бинарное возведение в степень, n >= 0. Ожидаемая сложность: O(log n)
     При заданном mod все умножения выполняются по модулю (результат x**n % mod).
     """
     if x is None or n is None:
