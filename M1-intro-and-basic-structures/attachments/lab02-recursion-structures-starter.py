@@ -61,8 +61,15 @@ CALLS = {"fib_naive": 0, "fib_memo": 0}  # счётчики рекурсивны
 
 def factorial(n: int) -> int:
     """Факториал n >= 0 рекурсивно. Ожидаемая сложность: TODO (обосновать в отчёте)."""
-    # TODO: базовое условие + рекурсивный переход
-    raise NotImplementedError
+    if not isinstance(n, int):
+        raise TypeError(f"[ERROR]: n should be int, got {type(n).__name__} instead")
+    if n < 0:
+        raise ValueError("[ERROR]: n should be >= 0")
+
+    if n == 0:
+        return 1
+
+    return n * factorial(n - 1)
 
 
 def fib_naive(n: int) -> int:
@@ -71,8 +78,11 @@ def fib_naive(n: int) -> int:
     Ожидаемая сложность: TODO (экспоненциальная — показать счётчиком вызовов).
     """
     CALLS["fib_naive"] += 1
-    # TODO: F(0)=0, F(1)=1, далее F(n)=F(n-1)+F(n-2)
-    raise NotImplementedError
+
+    if n in [0, 1]:
+        return n
+
+    return fib_naive(n - 1) + fib_naive(n - 2)
 
 
 def fib_memo(n: int, memo: dict[int, int] | None = None) -> int:
@@ -81,8 +91,20 @@ def fib_memo(n: int, memo: dict[int, int] | None = None) -> int:
     Ожидаемая сложность: TODO (линейная — сравнить счётчики в отчёте).
     """
     CALLS["fib_memo"] += 1
-    # TODO: словарь memo передаётся по рекурсии; повторные подзадачи не пересчитываются
-    raise NotImplementedError
+
+    if memo is None:
+        memo = dict()
+
+    print(memo)
+    if n in memo:
+        return memo[n]
+
+    if n in [0, 1]:
+        return n
+
+    result = fib_memo(n - 1, memo) + fib_memo(n - 2, memo)
+    memo[n] = result
+    return result
 
 
 def hanoi(n: int, src: str = "A", dst: str = "C", aux: str = "B",
@@ -93,10 +115,23 @@ def hanoi(n: int, src: str = "A", dst: str = "C", aux: str = "B",
     в него парой (откуда, куда). self_check проигрывает эти ходы и проверяет,
     что больший диск ни разу не кладётся на меньший, все диски оказываются
     на dst, а число перемещений равно 2**n - 1.
+
+    SRC - ОТКУДА (A)
+    AUX - ВСПОМОГАТЕЛЬНОЕ (B)
+    DST - КУДА (C)
     """
-    # TODO: базовое условие n == 0; иначе перенести n-1 на aux, 1 на dst, n-1 на dst
-    # (moves передаётся во все рекурсивные вызовы)
-    raise NotImplementedError
+
+    if n == 0:
+        return 0
+
+    result1 = hanoi(n - 1, src, aux, dst, moves)
+
+    if isinstance(moves, list):
+        moves.append((src, dst))
+
+    result2 = hanoi(n - 1, aux, dst, src, moves)
+
+    return result1 + 1 + result2
 
 
 # ---------------------------------------------------------------------------
@@ -129,17 +164,28 @@ class DynamicArray:
 
     def _grow(self) -> None:
         """Увеличить ёмкость в 2 раза и скопировать элементы в новый буфер."""
-        # TODO: выделить новый буфер размера 2 * capacity, перенести _size элементов,
-        # увеличить self.copies на число перенесённых элементов
-        raise NotImplementedError
+
+        self._capacity *= 2
+        new_buffer: list = [None] * self.capacity
+
+        for i in range(self._size):
+            new_buffer[i] = self._buffer[i]
+
+        self.copies += self._size
+        self._buffer = new_buffer
+
 
     def append(self, value) -> None:
         """Добавить элемент в конец; при size == capacity сначала вызвать _grow.
 
         Амортизированная сложность: TODO (обосновать методом учёта в отчёте).
         """
-        # TODO: рост при необходимости, запись в ячейку _buffer[_size], инкремент _size
-        raise NotImplementedError
+
+        if self._size == self._capacity:
+            self._grow()
+
+        self._buffer[self._size] = value
+        self._size += 1
 
     def pop(self):
         """Удалить и вернуть последний элемент; для пустого массива — IndexError.
@@ -150,19 +196,42 @@ class DynamicArray:
         сжатие уже при заполнении на ½ даёт Θ(n) на операцию, если чередовать
         append и pop на границе ёмкости.
         """
-        # TODO: проверка на пустоту, чтение _buffer[_size - 1], очистка ячейки
-        # (None — чтобы буфер не удерживал объект), декремент _size
-        raise NotImplementedError
+
+        if self._size == 0:
+            raise IndexError("pop from an empty array")
+
+        value = self._buffer[self._size - 1]
+        self._buffer[self._size - 1] = None
+        self._size -= 1
+
+        if self._capacity // 4 >= self._size > self.INITIAL_CAPACITY:
+            new_capacity = self._capacity // 2
+            new_buffer = [None] * new_capacity
+
+            for i in range(self._size):
+                new_buffer[i] = self._buffer[i]
+
+            self.copies += self._size
+            self._capacity = new_capacity
+            self._buffer = new_buffer
+
+        return value
 
     def get(self, index: int):
         """Вернуть элемент по индексу 0 <= index < size; иначе IndexError."""
-        # TODO: проверка границ (включая отрицательные индексы) + чтение из буфера
-        raise NotImplementedError
+
+        if index < 0 or index >= self._size:
+            raise IndexError("Index out of range")
+
+        return self._buffer[index]
 
     def set(self, index: int, value) -> None:
         """Записать элемент по индексу 0 <= index < size; иначе IndexError."""
-        # TODO: проверка границ + запись в буфер
-        raise NotImplementedError
+
+        if index < 0 or index >= self._size:
+            raise IndexError("Index out of range")
+
+        self._buffer[index] = value
 
 
 # ---------------------------------------------------------------------------
@@ -181,19 +250,23 @@ class Stack:
 
     def push(self, value) -> None:
         """Положить элемент на вершину. Амортизированная сложность: TODO."""
-        # TODO: делегировать DynamicArray.append
-        raise NotImplementedError
+
+        self._data.append(value)
 
     def pop(self):
         """Снять элемент с вершины; для пустого стека — IndexError."""
-        # TODO: делегировать DynamicArray.pop
-        raise NotImplementedError
+
+        return self._data.pop()
 
     def peek(self):
         """Вернуть вершину без удаления; для пустого стека — IndexError."""
         # TODO: для пустого стека — IndexError с понятным сообщением,
         # иначе DynamicArray.get(len - 1)
-        raise NotImplementedError
+
+        if len(self._data) == 0:
+            raise IndexError("can't get any data from an empty stack")
+
+        return self._data.get(len(self._data) - 1)
 
 
 class _Node:
@@ -225,22 +298,67 @@ class Deque:
     def push_front(self, value) -> None:
         """Добавить элемент в начало. Сложность: TODO."""
         # TODO: создать узел, перевязать ссылки head (учесть пустой дек)
-        raise NotImplementedError
+        new_node = _Node(value)
+
+        if self._head is None:
+            self._head = new_node
+            self._tail = new_node
+        else:
+            new_node.next = self._head
+            self._head.prev = new_node
+            self._head = new_node
+
+        self._size += 1
 
     def push_back(self, value) -> None:
         """Добавить элемент в конец. Сложность: TODO."""
-        # TODO: симметрично push_front для tail
-        raise NotImplementedError
+
+        new_node = _Node(value)
+
+        if self._tail is None:
+            self._tail = new_node
+            self._head = new_node
+        else:
+            new_node.prev = self._tail
+            self._tail.next = new_node
+            self._tail = new_node
+
+        self._size += 1
 
     def pop_front(self):
         """Извлечь элемент из начала; для пустого дека — IndexError."""
-        # TODO: учесть переход к пустому деку (tail тоже обнуляется)
-        raise NotImplementedError
+        if self._size == 0:
+            raise IndexError("pop_front from an empty deque")
+
+        value = self._head.value
+        self._head = self._head.next
+
+        if self._head is None:
+            self._tail = None
+        else:
+            self._head.prev = None
+
+        self._size -= 1
+
+        return value
 
     def pop_back(self):
         """Извлечь элемент из конца; для пустого дека — IndexError."""
-        # TODO: симметрично pop_front (при опустошении обнуляется и head)
-        raise NotImplementedError
+        if self._size == 0:
+            raise IndexError("pop_back from an empty deque")
+
+        value = self._tail.value
+        self._tail = self._tail.prev
+
+        if self._tail is None:
+            self._head = None
+        else:
+            self._tail.next = None
+
+        self._size -= 1
+
+        return value
+
 
 
 # ---------------------------------------------------------------------------

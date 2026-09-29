@@ -9,6 +9,7 @@ def factorial(n: int) -> int:
 
     if n == 0:
         return 1
+
     return n * factorial(n - 1)
 
 
@@ -20,9 +21,10 @@ def fib_naive(n: int) -> int:
     Ожидаемая сложность: TODO (экспоненциальная — показать счётчиком вызовов).
     """
     # CALLS["fib_naive"] += 1
-    # TODO: F(0)=0, F(1)=1, далее F(n)=F(n-1)+F(n-2)
+
     if n in [0, 1]:
         return n
+
     return fib_naive(n - 1) + fib_naive(n - 2)
 
 
@@ -142,11 +144,20 @@ class DynamicArray:
         if self._size == 0:
             raise IndexError("pop from an empty array")
 
-        # (None — чтобы буфер не удерживал объект), декремент _size
-
         value = self._buffer[self._size - 1]
         self._buffer[self._size - 1] = None
         self._size -= 1
+
+        if self._capacity // 4 >= self._size > self.INITIAL_CAPACITY:
+            new_capacity = self._capacity // 2
+            new_buffer = [None] * new_capacity
+
+            for i in range(self._size):
+                new_buffer[i] = self._buffer[i]
+
+            self.copies += self._size
+            self._capacity = new_capacity
+            self._buffer = new_buffer
 
         return value
 
