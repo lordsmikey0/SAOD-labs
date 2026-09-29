@@ -113,6 +113,7 @@ class DynamicArray:
         for i in range(self._size):
             new_buffer[i] = self._buffer[i]
 
+        self.copies += self._size
         self._buffer = new_buffer
 
 
@@ -137,13 +138,21 @@ class DynamicArray:
         сжатие уже при заполнении на ½ даёт Θ(n) на операцию, если чередовать
         append и pop на границе ёмкости.
         """
-        # TODO: проверка на пустоту, чтение _buffer[_size - 1], очистка ячейки
+
+        if self._size == 0:
+            raise IndexError("pop from an empty array")
+
         # (None — чтобы буфер не удерживал объект), декремент _size
-        raise NotImplementedError
+
+        value = self._buffer[self._size - 1]
+        self._buffer[self._size - 1] = None
+        self._size -= 1
+
+        return value
 
     def get(self, index: int):
         """Вернуть элемент по индексу 0 <= index < size; иначе IndexError."""
-        # TODO: проверка границ (включая отрицательные индексы) + чтение из буфера
+
         if index < 0 or index >= self._size:
             raise IndexError("Index out of range")
 
@@ -151,7 +160,7 @@ class DynamicArray:
 
     def set(self, index: int, value) -> None:
         """Записать элемент по индексу 0 <= index < size; иначе IndexError."""
-        # TODO: проверка границ + запись в буфер
+
         if index < 0 or index >= self._size:
             raise IndexError("Index out of range")
 
