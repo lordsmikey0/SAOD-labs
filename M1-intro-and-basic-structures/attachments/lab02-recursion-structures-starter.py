@@ -60,7 +60,7 @@ CALLS = {"fib_naive": 0, "fib_memo": 0}  # счётчики рекурсивны
 
 
 def factorial(n: int) -> int:
-    """Факториал n >= 0 рекурсивно. Ожидаемая сложность: TODO (обосновать в отчёте)."""
+    """Факториал n >= 0 рекурсивно. Ожидаемая сложность: O(n)"""
     if not isinstance(n, int):
         raise TypeError(f"[ERROR]: n should be int, got {type(n).__name__} instead")
     if n < 0:
@@ -75,7 +75,7 @@ def factorial(n: int) -> int:
 def fib_naive(n: int) -> int:
     """n-е число Фибоначчи наивной рекурсией; увеличивает CALLS["fib_naive"].
 
-    Ожидаемая сложность: TODO (экспоненциальная — показать счётчиком вызовов).
+    Ожидаемая сложность: O(2^n)
     """
     CALLS["fib_naive"] += 1
 
@@ -88,7 +88,7 @@ def fib_naive(n: int) -> int:
 def fib_memo(n: int, memo: dict[int, int] | None = None) -> int:
     """n-е число Фибоначчи с мемоизацией; увеличивает CALLS["fib_memo"].
 
-    Ожидаемая сложность: TODO (линейная — сравнить счётчики в отчёте).
+    Ожидаемая сложность: O(n)
     """
     CALLS["fib_memo"] += 1
 
