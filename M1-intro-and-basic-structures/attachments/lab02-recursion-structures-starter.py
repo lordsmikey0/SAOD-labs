@@ -178,7 +178,7 @@ class DynamicArray:
     def append(self, value) -> None:
         """Добавить элемент в конец; при size == capacity сначала вызвать _grow.
 
-        Амортизированная сложность: TODO (обосновать методом учёта в отчёте).
+        Амортизированная сложность: O(1)
         """
 
         if self._size == self._capacity:
@@ -249,7 +249,7 @@ class Stack:
         return len(self._data)
 
     def push(self, value) -> None:
-        """Положить элемент на вершину. Амортизированная сложность: TODO."""
+        """Положить элемент на вершину. Амортизированная сложность: O(1)"""
 
         self._data.append(value)
 
@@ -260,8 +260,6 @@ class Stack:
 
     def peek(self):
         """Вернуть вершину без удаления; для пустого стека — IndexError."""
-        # TODO: для пустого стека — IndexError с понятным сообщением,
-        # иначе DynamicArray.get(len - 1)
 
         if len(self._data) == 0:
             raise IndexError("can't get any data from an empty stack")
@@ -296,8 +294,8 @@ class Deque:
         return self._size
 
     def push_front(self, value) -> None:
-        """Добавить элемент в начало. Сложность: TODO."""
-        # TODO: создать узел, перевязать ссылки head (учесть пустой дек)
+        """Добавить элемент в начало. Сложность: O(1)"""
+
         new_node = _Node(value)
 
         if self._head is None:
@@ -311,7 +309,7 @@ class Deque:
         self._size += 1
 
     def push_back(self, value) -> None:
-        """Добавить элемент в конец. Сложность: TODO."""
+        """Добавить элемент в конец. Сложность: O(1)"""
 
         new_node = _Node(value)
 
@@ -327,6 +325,7 @@ class Deque:
 
     def pop_front(self):
         """Извлечь элемент из начала; для пустого дека — IndexError."""
+
         if self._size == 0:
             raise IndexError("pop_front from an empty deque")
 
@@ -344,6 +343,7 @@ class Deque:
 
     def pop_back(self):
         """Извлечь элемент из конца; для пустого дека — IndexError."""
+
         if self._size == 0:
             raise IndexError("pop_back from an empty deque")
 
@@ -701,6 +701,46 @@ def check_variant_ops(stack_ops: list[Op], deque_ops: list[Op]) -> None:
                            std_deque_methods(collections.deque()), "ops_deque.txt")
 
 
+def check_invariants() -> None:
+    """Собственные проверки инвариантов структур."""
+
+    # DynamicArray
+    arr = DynamicArray()
+    for i in range(10):
+        arr.append(i)
+
+    expect(arr._size <= arr._capacity,
+           "DynamicArray: size > capacity")
+    expect(len(arr._buffer) == arr._capacity,
+           "DynamicArray: размер buffer не равен capacity")
+
+    # Deque
+    dq = Deque()
+    dq.push_back(1)
+    dq.push_back(2)
+    dq.push_front(0)
+
+    expect(dq._head is not None and dq._tail is not None,
+           "Deque: непустой дек имеет head и tail")
+    expect(dq._head.prev is None,
+           "Deque: head.prev != None")
+    expect(dq._tail.next is None,
+           "Deque: tail.next != None")
+    expect(dq._head.next.prev is dq._head,
+           "Deque: нарушена связь next/prev")
+    expect(dq._tail.prev.next is dq._tail,
+           "Deque: нарушена связь prev/next")
+
+    count = 0
+    node = dq._head
+    while node is not None:
+        count += 1
+        node = node.next
+
+    expect(count == dq._size,
+           "Deque: количество узлов не совпадает с size")
+
+
 def self_check(stack_ops: list[Op], deque_ops: list[Op]) -> None:
     """Все проверки по разделам; при любой ошибке замеры не выполняются."""
     checks = (
@@ -709,6 +749,7 @@ def self_check(stack_ops: list[Op], deque_ops: list[Op]) -> None:
         ("Stack", check_stack),
         ("Deque", check_deque),
         ("операции варианта", lambda: check_variant_ops(stack_ops, deque_ops)),
+        ("инварианты", check_invariants),
     )
     failed = 0
     print("self_check:")
@@ -728,7 +769,6 @@ def self_check(stack_ops: list[Op], deque_ops: list[Op]) -> None:
             failed += 1
         else:
             print(f"  {name}: OK")
-    # TODO: добавить собственные проверки инвариантов и описать их в отчёте.
     if failed:
         raise SystemExit(f"self_check: не пройдено разделов — {failed}; "
                          f"замеры выполняются только после всех проверок.")
@@ -825,7 +865,6 @@ def run_benchmarks(append_sizes: list[int], stack_ops: list[Op],
         fib_memo(n)
         print(f"  n={n:>2}  F(n)={value:>6}  fib_naive: {CALLS['fib_naive']:>7} вызовов"
               f"  fib_memo: {CALLS['fib_memo']:>2} вызовов")
-    # TODO: вывести в отчёте формулы числа вызовов обеих функций и сверить с таблицей.
 
     print("\nСерии append на размерах варианта:")
     results["append"] = []
@@ -838,8 +877,6 @@ def run_benchmarks(append_sizes: list[int], stack_ops: list[Op],
         results["append"].append((n, t_own, t_list, cost))
         print(f"  n={n:>7}  t/n: DynamicArray {t_own:.2e} c, list {t_list:.2e} c"
               f"  копирований {arr.copies:>7}  (n + копирования)/n = {cost:.3f}")
-    # TODO: объяснить методом учёта, почему (n + копирования)/n < 3 и почему
-    # у соседних размеров 2**k и 2**k + 1 эта величина различается почти на 1.
 
     for key, title in FRONT_TITLES.items():
         print(f"\n{title}: время одной операции при размере n = "
@@ -866,8 +903,6 @@ def run_benchmarks(append_sizes: list[int], stack_ops: list[Op],
         t_ref = bench(lambda: replay(ops, make_ref())) / len(ops)
         print(f"  {name}: {own_label} {t_own:.2e} c, {ref_label} {t_ref:.2e} c"
               f" — в {t_own / t_ref:.1f} раза медленнее")
-    # TODO: объяснить, откуда постоянный множитель между своими и стандартными
-    # структурами, если асимптотика операций одинакова.
     return results
 
 
@@ -928,8 +963,6 @@ def plot_results(results: dict, out_dir: Path) -> None:
     fig2.savefig(front_path, dpi=150)
 
     print(f"\nГрафики сохранены:\n  {append_path}\n  {front_path}")
-    # TODO: в отчёте объяснить, почему у list.insert(0, x) и list.pop(0) наклон
-    # около 1, а у операций на концах deque и своего Deque — около 0.
 
 
 # ---------------------------------------------------------------------------

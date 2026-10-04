@@ -122,7 +122,7 @@ class DynamicArray:
     def append(self, value) -> None:
         """Добавить элемент в конец; при size == capacity сначала вызвать _grow.
 
-        Амортизированная сложность: TODO (обосновать методом учёта в отчёте).
+        Амортизированная сложность: O(1)
         """
 
         if self._size == self._capacity:
