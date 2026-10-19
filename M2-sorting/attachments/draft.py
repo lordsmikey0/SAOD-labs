@@ -33,7 +33,19 @@ def insertion_sort(array: list) -> dict:
     Худший случай - O
 
     """
+    array = array.copy()
+    comparisons: int = 0
+    exchanges: int = 0
 
+    for i in range(1, len(array)):
+        key = array[i]
+        j = i - 1
 
+        while j >= 0 and key < array[j]:
+            array[j + 1] = array[j]
+            j -= 1
+            exchanges += 1
 
-    return {}
+        array[j + 1] = key
+
+    return { "array": array, "comparisons": comparisons, "exchanges": exchanges}
