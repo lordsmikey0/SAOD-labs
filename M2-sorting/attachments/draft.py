@@ -1,5 +1,9 @@
 def bubble_sort(array: list) -> dict:
-    """Сортировка массива пузырьком с флагом досрочного выхода. Сложность: O(n^2)"""
+    """
+    Сортировка массива пузырьком с флагом досрочного выхода.
+    Сложность: O(n^2)
+
+    """
     array = array.copy()
     comparisons: int = 0
     exchanges: int = 0
@@ -18,3 +22,18 @@ def bubble_sort(array: list) -> dict:
             break
 
     return {"array": array, "comparisons": comparisons, "exchanges": exchanges}
+
+
+def insertion_sort(array: list) -> dict:
+    """
+    Сортировка массива вставкой.
+
+    Сложность:
+    Лучший случай - O
+    Худший случай - O
+
+    """
+
+
+
+    return {}
