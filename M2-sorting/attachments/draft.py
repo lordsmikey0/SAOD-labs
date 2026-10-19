@@ -41,11 +41,17 @@ def insertion_sort(array: list) -> dict:
         key = array[i]
         j = i - 1
 
-        while j >= 0 and key < array[j]:
+        while j >= 0:
+            comparisons += 1
+
+            if key >= array[j]:
+                break
+
             array[j + 1] = array[j]
-            j -= 1
             exchanges += 1
+            j -= 1
 
         array[j + 1] = key
+        exchanges += 1
 
     return { "array": array, "comparisons": comparisons, "exchanges": exchanges}
