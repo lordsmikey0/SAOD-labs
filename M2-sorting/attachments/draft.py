@@ -54,4 +54,27 @@ def insertion_sort(array: list) -> dict:
         array[j + 1] = key
         exchanges += 1
 
-    return { "array": array, "comparisons": comparisons, "exchanges": exchanges}
+    return {"array": array, "comparisons": comparisons, "exchanges": exchanges}
+
+
+def selection_sort(array: list) -> dict:
+    """Сортировка выбором. Ожидаемая сложность: TODO потом определю"""
+
+    array = array.copy()
+    comparisons: int = 0
+    exchanges: int = 0
+
+    for i in range(len(array) - 1):
+        min_index = i
+
+        for j in range(i + 1, len(array)):
+            comparisons += 1
+            if array[j] < array[min_index]:
+                min_index = j
+
+        if min_index != i:
+            array[i], array[min_index] = array[min_index], array[i]
+            exchanges += 1
+
+    return {"array": array, "comparisons": comparisons, "exchanges": exchanges}
+
