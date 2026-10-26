@@ -1,12 +1,12 @@
 import random
 
-def bubble_sort(array: list) -> dict:
+def bubble_sort(a: list) -> tuple[list, int, int]:
     """
     Сортировка массива пузырьком с флагом досрочного выхода.
     Сложность: O(n^2)
 
     """
-    array = array.copy()
+    array = a.copy()
     comparisons: int = 0
     exchanges: int = 0
 
@@ -23,10 +23,10 @@ def bubble_sort(array: list) -> dict:
         if not swapped:
             break
 
-    return {"array": array, "comparisons": comparisons, "exchanges": exchanges}
+    return array, comparisons, exchanges
 
 
-def insertion_sort(array: list) -> dict:
+def insertion_sort(a: list) -> tuple[list, int, int]:
     """
     Сортировка массива вставкой.
 
@@ -35,7 +35,7 @@ def insertion_sort(array: list) -> dict:
     Худший случай - O(n^2)
 
     """
-    array = array.copy()
+    array = a.copy()
     comparisons: int = 0
     exchanges: int = 0
 
@@ -56,13 +56,13 @@ def insertion_sort(array: list) -> dict:
         array[j + 1] = key
         exchanges += 1
 
-    return {"array": array, "comparisons": comparisons, "exchanges": exchanges}
+    return array, comparisons, exchanges
 
 
-def selection_sort(array: list) -> dict:
+def selection_sort(a: list) -> tuple[list, int, int]:
     """Сортировка выбором. Ожидаемая сложность: O(n^2)"""
 
-    array = array.copy()
+    array = a.copy()
     comparisons: int = 0
     exchanges: int = 0
 
@@ -79,10 +79,10 @@ def selection_sort(array: list) -> dict:
             array[i], array[min_index] = array[min_index], array[i]
             exchanges += 1
 
-    return {"array": array, "comparisons": comparisons, "exchanges": exchanges}
+    return array, comparisons, exchanges
 
 
-def quick_sort(array: list, rng: random.Random | None = None) -> list:
+def quick_sort(a: list, rng: random.Random | None = None) -> list:
     """QuickSort с выбором опорного через rng.randrange. Возвращает новый список.
 
     Ожидаемая сложность:
@@ -94,7 +94,7 @@ def quick_sort(array: list, rng: random.Random | None = None) -> list:
     if rng is None:
         rng = random.Random()
 
-    array = array.copy()
+    array = a.copy()
 
     def sort(lo: int, hi: int) -> None:
         if hi - lo <= 1:
