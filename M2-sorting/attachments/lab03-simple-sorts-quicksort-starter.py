@@ -22,7 +22,7 @@ import time
 # ---------------------------------------------------------------------------
 
 
-def bubble_sort(a: list) -> tuple[list, int, int]:
+def bubble_sort(a: list, key_fn = lambda x: x) -> tuple[list, int, int]:
     """
     Сортировка массива пузырьком с флагом досрочного выхода.
     Сложность: O(n^2)
@@ -36,7 +36,7 @@ def bubble_sort(a: list) -> tuple[list, int, int]:
         swapped = False
 
         for j in range(0, len(array) - i - 1):
-            if array[j] > array[j + 1]:
+            if key_fn(array[j]) > key_fn(array[j + 1]):
                 array[j], array[j + 1] = array[j + 1], array[j]
                 exchanges += 1
                 swapped = True
@@ -48,7 +48,7 @@ def bubble_sort(a: list) -> tuple[list, int, int]:
     return array, comparisons, exchanges
 
 
-def insertion_sort(a: list) -> tuple[list, int, int]:
+def insertion_sort(a: list, key_fn = lambda x: x) -> tuple[list, int, int]:
     """
     Сортировка массива вставкой.
 
@@ -68,7 +68,7 @@ def insertion_sort(a: list) -> tuple[list, int, int]:
         while j >= 0:
             comparisons += 1
 
-            if key >= array[j]:
+            if key_fn(key) >= key_fn(array[j]):
                 break
 
             array[j + 1] = array[j]
@@ -81,7 +81,7 @@ def insertion_sort(a: list) -> tuple[list, int, int]:
     return array, comparisons, exchanges
 
 
-def selection_sort(a: list) -> tuple[list, int, int]:
+def selection_sort(a: list, key_fn = lambda x: x) -> tuple[list, int, int]:
     """Сортировка выбором. Ожидаемая сложность: O(n^2)"""
 
     array = a.copy()
@@ -94,7 +94,7 @@ def selection_sort(a: list) -> tuple[list, int, int]:
         for j in range(i + 1, len(array)):
             comparisons += 1
 
-            if array[j] < array[min_index]:
+            if key_fn(array[j]) < key_fn(array[min_index]):
                 min_index = j
 
         if min_index != i:
@@ -109,7 +109,7 @@ def selection_sort(a: list) -> tuple[list, int, int]:
 # ---------------------------------------------------------------------------
 
 
-def quick_sort(a: list, rng: random.Random | None = None) -> list:
+def quick_sort(a: list, rng: random.Random | None = None,  key_fn = lambda x: x) -> list:
     """QuickSort с выбором опорного через rng.randrange. Возвращает новый список.
 
     Ожидаемая сложность:
@@ -135,7 +135,7 @@ def quick_sort(a: list, rng: random.Random | None = None) -> list:
         boundary = lo
 
         for j in range(lo, hi - 1):
-            if array[j] < pivot:
+            if key_fn(array[j]) < key_fn(pivot):
                 array[boundary], array[j] = array[j], array[boundary]
                 boundary += 1
 
@@ -153,6 +153,17 @@ def quick_sort(a: list, rng: random.Random | None = None) -> list:
 # ---------------------------------------------------------------------------
 
 
+def conclusion_constructor(result, pairs: list,  func_name: str = "") -> None:
+    """
+    Конструктор выводов для stability_demo.
+
+    Показывает, какая из сортировок стабильна, а какая - нет
+    """
+
+    standard: list = sorted(pairs, key=lambda x: x[0])
+
+    print(f"{func_name}:\n-----\nresult: {result}", "порядок сохранен" if result == standard else "порядок нарушен", "\n")
+
 def stability_demo() -> None:
     """Показать, какие из четырёх сортировок стабильны.
 
@@ -161,9 +172,30 @@ def stability_demo() -> None:
     по ключу (сравнение только по p[0]!) и напечатать порядок меток при равных
     ключах. Вывод о стабильности каждой сортировки включить в отчёт.
     """
-    # TODO: подготовить пары, прогнать все четыре сортировки, напечатать итог
-    raise NotImplementedError
 
+    test_data: list = [
+        [(1, "a"), (1, "b"), (2, "c"), (1, "d")],
+        [(2, "a"), (2, "b"), (1, "c")],
+        [(3, "c"), (3, "d"), (1, "a"), (2, "b")]
+    ]
+
+    algorithms = [
+        bubble_sort,
+        insertion_sort,
+        selection_sort,
+        quick_sort
+    ]
+
+    key_fn = lambda x: x[0]
+
+    for pairs in test_data:
+        for algorithm in algorithms:
+            if algorithm != quick_sort:
+                result, comparisons, exchanges = algorithm(pairs, key_fn)
+            else:
+                result = algorithm(pairs, key_fn=key_fn)
+
+            conclusion_constructor(result, pairs, algorithm.__name__)
 
 # ---------------------------------------------------------------------------
 # 4. Классы входов (данные по варианту, детерминированно по seed)
@@ -274,8 +306,8 @@ def main() -> None:
     seed = 30 + args.variant
     random.seed(seed)
     self_check()
-    # stability_demo()
-    # run_benchmarks(seed)
+    stability_demo()
+    run_benchmarks(seed)
 
 
 if __name__ == "__main__":
