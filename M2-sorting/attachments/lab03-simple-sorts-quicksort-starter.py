@@ -14,6 +14,7 @@ import argparse
 import random
 import statistics
 import time
+from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # 1. Простые сортировки со счётчиками (сортируют КОПИЮ входа, вход не меняют)
@@ -280,24 +281,83 @@ def bench(fn, data: list) -> float:
     return statistics.median(times)
 
 
-def run_benchmarks(seed: int) -> None:
-    """Замеры всех алгоритмов на трёх классах входов; результат — таблица в stdout."""
+def run_benchmarks(seed: int) -> dict:
+    result = {}
+
     plans = [
         ("bubble_sort", ALGORITHMS["bubble_sort"], SIZES_QUADRATIC),
         ("insertion_sort", ALGORITHMS["insertion_sort"], SIZES_QUADRATIC),
         ("selection_sort", ALGORITHMS["selection_sort"], SIZES_QUADRATIC),
         ("quick_sort", lambda a: quick_sort(a, random.Random(seed)), SIZES_QUICK),
     ]
+
     for name, fn, sizes in plans:
+        result[name] = {}
         print(f"\n{name}:")
+
         for n in sizes:
             for cls, data in make_inputs(n, seed).items():
-                print(f"  n={n:>7}  вход={cls:<13} t={bench(fn, data):.6f} c")
+
+                elapsed = bench(fn, data)
+
+                print(f"  n={n:>7}  вход={cls:<13} t={elapsed:.6f} c")
+
+                if cls not in result[name]:
+                    result[name][cls] = []
+
+                result[name][cls].append((n, elapsed))
+
+    print(result)
+    return result
     # TODO: построить log-log графики (matplotlib) по классам входов;
     # TODO: сопоставить наклоны с O(n^2) и O(n log n), объяснить расхождения
     #       (в т. ч. лучший случай вставок и поведение пузырька на упорядоченном входе);
     # TODO: включить в отчёт таблицы счётчиков сравнений/обменов.
 
+
+# ---------------------------------------------------------------------------
+# 7. Графики
+# ---------------------------------------------------------------------------
+
+def plot_results(results: dict, out_dir: Path) -> None:
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print("matplotlib не установлен")
+        return
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    for cls in ["упорядоченный", "случайный", "обратный"]:
+        fig, ax = plt.subplots(figsize=(7, 5))
+
+        for name, data in results.items():
+            points = data[cls]
+
+            ns = [n for n, t in points]
+            ts = [t for n, t in points]
+
+            ax.plot(ns, ts, marker="o", label=name)
+
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+
+        ax.set_xlabel("Размер массива n")
+        ax.set_ylabel("Время, с")
+        ax.set_title(f"Время сортировки: {cls} вход")
+
+        ax.grid(True, which="both", linewidth=0.3)
+        ax.legend()
+
+        fig.tight_layout()
+
+        path = out_dir / f"lab03_{cls}.png"
+        fig.savefig(path, dpi=150)
+        plt.close(fig)
+
+        print(f"График сохранён: {path}")
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
@@ -307,7 +367,8 @@ def main() -> None:
     random.seed(seed)
     self_check()
     stability_demo()
-    run_benchmarks(seed)
+    results = run_benchmarks(seed)
+    plot_results(results, Path("."))
 
 
 if __name__ == "__main__":
