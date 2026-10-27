@@ -190,6 +190,7 @@ def stability_demo() -> None:
     key_fn = lambda x: x[0]
 
     for pairs in test_data:
+        print(f"********ТЕСТ №{test_data.index(pairs) + 1}********\n")
         for algorithm in algorithms:
             if algorithm != quick_sort:
                 result, comparisons, exchanges = algorithm(pairs, key_fn)
@@ -297,9 +298,7 @@ def run_benchmarks(seed: int) -> dict:
 
         for n in sizes:
             for cls, data in make_inputs(n, seed).items():
-
                 elapsed = bench(fn, data)
-
                 print(f"  n={n:>7}  вход={cls:<13} t={elapsed:.6f} c")
 
                 if cls not in result[name]:
@@ -307,7 +306,16 @@ def run_benchmarks(seed: int) -> dict:
 
                 result[name][cls].append((n, elapsed))
 
-    print(result)
+                if name != "quick_sort":
+                    _, comparisons, exchanges = {
+                        "bubble_sort": bubble_sort,
+                        "insertion_sort": insertion_sort,
+                        "selection_sort": selection_sort
+                    }[name](data)
+
+                    print(f"  comparisons={comparisons}, exchanges={exchanges}")
+                    print("-" * 30)
+
     return result
     # TODO: построить log-log графики (matplotlib) по классам входов;
     # TODO: сопоставить наклоны с O(n^2) и O(n log n), объяснить расхождения
