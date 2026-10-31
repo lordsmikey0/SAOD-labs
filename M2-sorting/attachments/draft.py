@@ -1,3 +1,6 @@
+import random
+
+
 def merge(left: list, right: list, key) -> list:
     """
     Стабильное слияние двух отсортированных списков в новый список.
@@ -130,3 +133,42 @@ def heap_sort(a: list[int]) -> None:
     for end in range(n - 1, 0, -1):
         a[0], a[end] = a[end], a[0]
         sift_down(a, 0, end)
+
+
+def quick_sort(a: list, rng: random.Random | None = None,  key_fn = lambda x: x) -> list:
+    """QuickSort с выбором опорного через rng.randrange. Возвращает новый список.
+
+    Ожидаемая сложность:
+
+    В среднем: O(n log n)
+    Худший случай: O(n^2)
+
+    """
+    if rng is None:
+        rng = random.Random()
+
+    array = a.copy()
+
+    def sort(lo: int, hi: int) -> None:
+        if hi - lo <= 1:
+            return
+
+        pivot_index = rng.randrange(lo, hi)
+        pivot = array[pivot_index]
+
+        array[pivot_index], array[hi - 1] = array[hi - 1], array[pivot_index]
+
+        boundary = lo
+
+        for j in range(lo, hi - 1):
+            if key_fn(array[j]) < key_fn(pivot):
+                array[boundary], array[j] = array[j], array[boundary]
+                boundary += 1
+
+        array[boundary], array[hi - 1] = array[hi - 1], array[boundary]
+
+        sort(lo, boundary)
+        sort(boundary + 1, hi)
+
+    sort(0, len(array))
+    return array
