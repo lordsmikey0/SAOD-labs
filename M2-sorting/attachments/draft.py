@@ -125,6 +125,14 @@ def sift_down(a: list[int], i: int, n: int) -> None:
         i = largest
 
 def heap_sort(a: list[int]) -> None:
+    """
+    HeapSort in-place: сортирует список a на месте, без вспомогательного массива.
+
+    Схема: построение max-кучи просейками вниз (снизу вверх, O(n)),
+    затем обмен вершины с последним элементом и просейка. Сложность: TODO.
+
+    """
+    # TODO: построение кучи + фаза извлечения максимумов
     n = len(a)
 
     for i in range(n // 2 - 1, -1, -1):
@@ -134,6 +142,7 @@ def heap_sort(a: list[int]) -> None:
         a[0], a[end] = a[end], a[0]
         sift_down(a, 0, end)
 
+# --------------
 
 def quick_sort(a: list, rng: random.Random | None = None,  key_fn = lambda x: x) -> list:
     """QuickSort с выбором опорного через rng.randrange. Возвращает новый список.
