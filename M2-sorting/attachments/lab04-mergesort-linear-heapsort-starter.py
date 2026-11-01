@@ -16,6 +16,7 @@ import statistics
 import sys
 import time
 import traceback
+from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # 1. Сортировки (реализуются вручную; sorted() используется только как эталон)
@@ -355,6 +356,7 @@ def run_benchmarks(seed: int) -> None:
         ("quick_sort (ЛР 3)", quick_sort),
         ("sorted() (эталон)", sorted),
     ]
+    results = {}
     for n in SIZES:
         datasets = make_datasets(rng, n)
         print(f"\nn = {n}:")
@@ -366,11 +368,73 @@ def run_benchmarks(seed: int) -> None:
                     # применимости counting; зафиксировать в таблице свойств
                     print(f"    {algo_name:>18}: пропуск (диапазон ключей)")
                     continue
-                print(f"    {algo_name:>18}: t = {bench(fn, data):.6f} c")
+                elapsed = bench(fn, data)
+
+                results.setdefault(algo_name, {}).setdefault(dist_name, []).append(
+                    (n, elapsed)
+                )
+
+                print(f"    {algo_name:>18}: t = {elapsed:.6f} c")
+
+    plot_results(results, Path("graphs"))
+
     # TODO: построить log-log графики (matplotlib) по каждому распределению;
     # TODO: заполнить таблицу свойств: время (лучший/средний/худший),
     #       память, стабильность, ограничения — для всех шести сортировок;
     # TODO: объяснить расхождения замеров с асимптотикой в отчёте.
+
+
+# ---------------------------------------------------------------------------
+# 4. Графики
+# ---------------------------------------------------------------------------
+
+def plot_results(results: dict, out_dir: Path) -> None:
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print("matplotlib не установлен")
+        return
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    for cls in [
+        "random_wide",
+        "random_small",
+        "sorted",
+        "reversed",
+        "almost_sorted",
+    ]:
+        fig, ax = plt.subplots(figsize=(7, 5))
+
+        for name, data in results.items():
+            points = data.get(cls, [])
+            if not points:
+                continue
+
+            ns = [n for n, t in points]
+            ts = [t for n, t in points]
+
+            ax.plot(ns, ts, marker="o", label=name)
+
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+
+        ax.set_xlabel("Размер массива n")
+        ax.set_ylabel("Время, с")
+        ax.set_title(f"Время сортировки: {cls} вход")
+
+        ax.grid(True, which="both", linewidth=0.3)
+        ax.legend()
+
+        fig.tight_layout()
+
+        path = out_dir / f"lab04_{cls}.png"
+        fig.savefig(path, dpi=150)
+        plt.close(fig)
+
+        print(f"График сохранён: {path}")
 
 
 def main() -> None:
