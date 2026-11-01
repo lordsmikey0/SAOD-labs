@@ -180,22 +180,27 @@ def quick_sort(a: list, rng: random.Random | None = None,  key_fn = lambda x: x)
         if hi - lo <= 1:
             return
 
-        pivot_index = rng.randrange(lo, hi)
-        pivot = array[pivot_index]
+        pivot = key_fn(array[rng.randrange(lo, hi)])
 
-        array[pivot_index], array[hi - 1] = array[hi - 1], array[pivot_index]
+        lt = lo
+        i = lo
+        gt = hi
 
-        boundary = lo
+        while i < gt:
+            value = key_fn(array[i])
 
-        for j in range(lo, hi - 1):
-            if key_fn(array[j]) < key_fn(pivot):
-                array[boundary], array[j] = array[j], array[boundary]
-                boundary += 1
+            if value < pivot:
+                array[lt], array[i] = array[i], array[lt]
+                lt += 1
+                i += 1
+            elif value > pivot:
+                gt -= 1
+                array[i], array[gt] = array[gt], array[i]
+            else:
+                i += 1
 
-        array[boundary], array[hi - 1] = array[hi - 1], array[boundary]
-
-        sort(lo, boundary)
-        sort(boundary + 1, hi)
+        sort(lo, lt)
+        sort(gt, hi)
 
     sort(0, len(array))
     return array
