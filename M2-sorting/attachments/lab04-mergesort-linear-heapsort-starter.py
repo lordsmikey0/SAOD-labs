@@ -274,11 +274,60 @@ def check_merge_stability() -> None:
            "merge_sort нестабилен: при равных ключах нарушен исходный порядок номеров")
 
 
+def check_heap_property() -> None:
+    """Проверяет свойство max-кучи после её построения."""
+    a = [2, 9, 7, 5, 3, 1]
+    n = len(a)
+
+    for i in range(n // 2 - 1, -1, -1):
+        sift_down(a, i, n)
+
+    for i in range(n):
+        left = 2 * i + 1
+        right = 2 * i + 2
+
+        if left < n:
+            expect(a[i] >= a[left], f"Нарушено свойство кучи: {a[i]} < {a[left]}")
+
+        if right < n:
+            expect(a[i] >= a[right], f"Нарушено свойство кучи: {a[i]} < {a[right]}")
+
+
+def check_radix_stability() -> None:
+    """Проверяет устойчивость одного поразрядного прохода."""
+
+    class TaggedInt(int):
+        def __new__(cls, value, tag):
+            obj = super().__new__(cls, value)
+            obj.tag = tag
+            return obj
+
+    a = [
+        TaggedInt(2, "A"),
+        TaggedInt(1, "B"),
+        TaggedInt(2, "C"),
+        TaggedInt(1, "D"),
+    ]
+
+    result = radix_sort_lsd(a)
+
+    tags = [element.tag for element in result]
+
+    expect(
+        tags == ["B", "D", "A", "C"],
+        f"Нарушена устойчивость RadixSort: {tags}"
+    )
+
+
 def self_check() -> None:
     """Все проверки по разделам; при любой ошибке замеры не выполняются."""
     # fn=fn фиксирует функцию текущего шага цикла (иначе все лямбды увидят последнюю)
     checks = [(name, lambda fn=fn: check_sort(fn)) for name, fn in SORTS.items()]
+
     checks.append(("стабильность merge_sort", check_merge_stability))
+    checks.append(("свойство max-кучи", check_heap_property))
+    checks.append(("устойчивость radix", check_radix_stability))
+
     failed = 0
     print("self_check:")
     for name, check in checks:
