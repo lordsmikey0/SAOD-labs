@@ -36,7 +36,7 @@ def load_quicksort():
     return module.quicksort
 
 
-quicksort = load_quicksort()
+fixed_quicksort = load_quicksort()
 
 # ---------------------------------------------------------------------------
 # 1. Шаг 1 методики: инварианты сортировки
@@ -228,6 +228,10 @@ def main() -> None:
     ap.add_argument("--variant", type=int, required=True, help="номер варианта")
     args = ap.parse_args()
     seed = 30 + args.variant  # вариантность — см. docs/reproducibility.md
+
+    global quicksort
+    quicksort = lambda data: fixed_quicksort(data, random.Random(seed))
+
     random.seed(seed)
     self_check()
     rng = random.Random(seed)

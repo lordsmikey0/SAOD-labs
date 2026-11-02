@@ -5,7 +5,7 @@
 from __future__ import annotations
 import random
 
-def quicksort(data: list[int]) -> list[int]:
+def quicksort(data: list[int], rng: random.Random | None = None) -> list[int]:
     """
     Sort a list of integers using the quicksort algorithm.
 
@@ -21,16 +21,19 @@ def quicksort(data: list[int]) -> list[int]:
         >>> quicksort([])
         []
     """
+    if rng is None:
+        random.Random()
+
     if len(data) <= 1:
         return list(data)
 
-    pivot = random.choice(data)
+    pivot = rng.choice(data)
 
     smaller = [x for x in data if x < pivot]
     equal = [x for x in data if x == pivot]
     larger = [x for x in data if x > pivot]
 
-    return quicksort(smaller) + equal + quicksort(larger)
+    return quicksort(smaller, rng) + equal + quicksort(larger, rng)
 
 
 if __name__ == "__main__":
