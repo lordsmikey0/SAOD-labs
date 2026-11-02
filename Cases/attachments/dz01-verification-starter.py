@@ -95,6 +95,7 @@ def representative_cases(rng: random.Random) -> list[tuple[str, list[int]]]:
         ("все одинаковые", [3, 3, 3, 3]),
         ("отсортированный", [1, 2, 3, 4, 5]),
         ("обратный", [5, 4, 3, 2, 1]),
+        ("два одинаковых", [2, 2]),
         ("случайный", [rng.randint(-10, 10) for _ in range(20)])
     ]
 
