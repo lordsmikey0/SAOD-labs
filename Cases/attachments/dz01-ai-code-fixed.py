@@ -3,6 +3,7 @@
 # Исправленный код. Исправление прошло строго после верификации
 
 from __future__ import annotations
+import random
 
 def quicksort(data: list[int]) -> list[int]:
     """
@@ -23,7 +24,7 @@ def quicksort(data: list[int]) -> list[int]:
     if len(data) <= 1:
         return list(data)
 
-    pivot = data[len(data) // 2]
+    pivot = random.choice(data)
 
     smaller = [x for x in data if x < pivot]
     equal = [x for x in data if x == pivot]
