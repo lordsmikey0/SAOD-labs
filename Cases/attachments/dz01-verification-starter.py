@@ -4,8 +4,8 @@
 
 Заготовка — это каркас, а не решение: заполните все TODO самостоятельно
 в соответствии с КИМ-01 (Cases) и методикой верификации по шагам 1–4
-(docs/ai-verification.md). Проверяемый код лежит рядом, в dz01-ai-code.py;
-исправлять его до завершения верификации запрещено.
+(docs/ai-verification.md). Сейчас проверяется исправленная копия
+dz01-ai-code-fixed.py; исходный код лежит рядом, в dz01-ai-code.py.
 
 Запуск: python dz01-verification-starter.py --variant N
 """
@@ -29,7 +29,7 @@ AI_CODE_PATH = Path(__file__).with_name("dz01-ai-code-fixed.py")
 
 
 def load_quicksort():
-    """Загружает функцию quicksort из соседнего файла dz01-ai-code.py."""
+    """Загружает функцию quicksort из файла, указанного в AI_CODE_PATH."""
     spec = importlib.util.spec_from_file_location("dz01_ai_code", AI_CODE_PATH)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -229,8 +229,11 @@ def main() -> None:
     args = ap.parse_args()
     seed = 30 + args.variant  # вариантность — см. docs/reproducibility.md
 
+    # Поток опорных элементов независим от генерации входов и продолжается
+    # между вызовами, включая прогрев и повторы бенчмарка.
+    pivot_rng = random.Random(seed)
     global quicksort
-    quicksort = lambda data: fixed_quicksort(data, random.Random(seed))
+    quicksort = lambda data: fixed_quicksort(data, pivot_rng)
 
     random.seed(seed)
     self_check()
