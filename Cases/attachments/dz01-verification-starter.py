@@ -223,6 +223,56 @@ def self_check() -> None:
     print("self_check: OK")
 
 
+# ---------------------------------------------------------------------------
+# 6. Графики
+# ---------------------------------------------------------------------------
+
+def plot_results(results: dict, out_dir: Path, version: str) -> None:
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print("matplotlib не установлен")
+        return
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    names = {
+        "random": "Случайный",
+        "sorted": "Упорядоченный",
+        "reversed": "Обратный"
+    }
+
+    fig, ax = plt.subplots(figsize=(7, 5))
+
+    for kind, points in results.items():
+        valid_points = [(n, t) for n, t in points if t is not None]
+
+        ns = [n for n, t in valid_points]
+        ts = [t for n, t in valid_points]
+
+        ax.plot(ns, ts, marker="o", label=names[kind])
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+
+    ax.set_xlabel("Размер массива n")
+    ax.set_ylabel("Время, с")
+    ax.set_title(f"QuickSort — {version}")
+
+    ax.grid(True, which="both", linewidth=0.3)
+    ax.legend()
+
+    fig.tight_layout()
+
+    path = out_dir / f"dz01_{version}.png"
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+    print(f"График сохранён: {path}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--variant", type=int, required=True, help="номер варианта")
