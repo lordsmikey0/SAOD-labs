@@ -17,6 +17,7 @@ import random
 import statistics
 import time
 from pathlib import Path
+from collections import Counter
 
 # ---------------------------------------------------------------------------
 # 0. Загрузка проверяемого кода
@@ -42,22 +43,36 @@ quicksort = load_quicksort()
 # ---------------------------------------------------------------------------
 
 
-def is_sorted(a: list[int]) -> bool:
+def is_sorted(a: list[int], b=lambda x: x) -> bool:
     """Инвариант 1: последовательность упорядочена по неубыванию."""
-    # TODO: реализовать проверку соседних пар
-    raise NotImplementedError
+    for i in range(len(a) - 1):
+        if a[i] > a[i + 1]:
+            return False
+    return True
 
 
 def same_multiset(a: list[int], b: list[int]) -> bool:
     """Инвариант 2: b — перестановка a (мультимножества элементов совпадают)."""
-    # TODO: реализовать через collections.Counter
-    raise NotImplementedError
+    return Counter(a) == Counter(b)
 
 
 def check_invariants(original: list[int], result: list[int]) -> list[str]:
     """Возвращает список нарушенных инвариантов (пустой список — нарушений нет)."""
     # TODO: проверить оба инварианта и вернуть понятные сообщения о нарушениях
-    raise NotImplementedError
+    output: list[str] = []
+
+    checks = [
+        ("Порядок элементов", lambda: is_sorted(result)),
+        ("Сохранение элементов", lambda: same_multiset(original, result))
+    ]
+
+    for name, check in checks:
+        if not check():
+            output.append(f"{name}: нарушение")
+
+    return output
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -73,15 +88,31 @@ def representative_cases(rng: random.Random) -> list[tuple[str, list[int]]]:
     отсортированный); типовые случайные с дубликатами и отрицательными
     числами (генерируются через rng — seed по варианту).
     """
-    # TODO: вернуть список пар (название класса, вход)
-    raise NotImplementedError
+    cases = [
+        ("пустой", []),
+        ("один элемент", [5]),
+        ("два элемента", [2, 1]),
+        ("все одинаковые", [3, 3, 3, 3]),
+        ("отсортированный", [1, 2, 3, 4, 5]),
+        ("обратный", [5, 4, 3, 2, 1]),
+        ("случайный", [rng.randint(-10, 10) for _ in range(20)])
+    ]
+
+    return cases
 
 
 def run_representative_tests(rng: random.Random) -> None:
     """Прогоняет quicksort по всем классам входов и печатает нарушения инвариантов."""
-    # TODO: для каждого входа вызвать quicksort и check_invariants;
-    # TODO: зафиксировать, какой класс входов вскрывает какой дефект.
-    raise NotImplementedError
+    cases = representative_cases(rng)
+
+    for name, data in cases:
+        result = quicksort(data)
+        errors = check_invariants(data, result)
+
+        if errors:
+            print(f"{name}: ОШИБКА — {', '.join(errors)}")
+        else:
+            print(f"{name}: OK")
 
 
 # ---------------------------------------------------------------------------
@@ -97,9 +128,31 @@ def compare_with_reference(rng: random.Random, runs: int = 300) -> None:
     отрицательными числами. Каждое расхождение печатайте вместе со входом,
     чтобы затем свести его к минимальному контрпримеру.
     """
-    # TODO: цикл на runs итераций: вход -> quicksort(вход) vs sorted(вход);
-    # TODO: подсчитать и напечатать число расхождений и минимальный контрпример.
-    raise NotImplementedError
+    mismatches = 0
+    minimal_case = None
+
+    for _ in range(runs):
+        size = rng.randint(0, 30)
+        data = [rng.randint(-10, 10) for _ in range(size)]
+
+        actual = quicksort(data)
+        expected = sorted(data)
+
+        if actual != expected:
+            mismatches += 1
+
+            print(f"Расхождение #{mismatches}")
+            print(f"  Вход:     {data}")
+            print(f"  quicksort: {actual}")
+            print(f"  sorted:    {expected}")
+
+            if minimal_case is None or len(data) < len(minimal_case):
+                minimal_case = data.copy()
+
+    print(f"\nВсего расхождений: {mismatches} из {runs}")
+
+    if minimal_case is not None:
+        print(f"Минимальный найденный контрпример: {minimal_case}")
 
 
 # ---------------------------------------------------------------------------
