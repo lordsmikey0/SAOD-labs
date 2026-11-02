@@ -240,7 +240,8 @@ def main() -> None:
     rng = random.Random(seed)
     run_representative_tests(rng)          # шаги 1–2
     compare_with_reference(rng, runs=300)  # шаг 3
-    run_benchmarks(seed)                   # шаг 4
+    results = run_benchmarks(seed)         # шаг 4
+
     # TODO: по итогам шагов 1–4 сформулировать в отчёте вердикт о применимости
     # TODO: (принять / принять с доработкой / отклонить), исправить дефекты в копии
     # TODO: файла и подтвердить исправление повторной полной верификацией.
