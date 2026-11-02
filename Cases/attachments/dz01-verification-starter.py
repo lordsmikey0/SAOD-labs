@@ -43,7 +43,7 @@ quicksort = load_quicksort()
 # ---------------------------------------------------------------------------
 
 
-def is_sorted(a: list[int], b=lambda x: x) -> bool:
+def is_sorted(a: list[int]) -> bool:
     """Инвариант 1: последовательность упорядочена по неубыванию."""
     for i in range(len(a) - 1):
         if a[i] > a[i + 1]:
