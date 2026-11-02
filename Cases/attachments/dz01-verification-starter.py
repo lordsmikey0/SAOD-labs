@@ -187,21 +187,27 @@ def bench(fn, data: list[int]) -> float:
     return statistics.median(times)
 
 
-def run_benchmarks(seed: int) -> None:
-    """Замеры quicksort на трёх классах входов; аварийные завершения фиксируются."""
+def run_benchmarks(seed: int) -> dict[str, list[tuple[int, float | None]]]:
+    """Возвращает замеры по классам входов; None обозначает RecursionError."""
     rng = random.Random(seed)
+    results: dict[str, list[tuple[int, float | None]]] = {}
     for kind in INPUT_KINDS:
+        results[kind] = []
         print(f"\nкласс входа: {kind}")
         for n in SIZES:
             data = make_input(rng, n, kind)
             try:
-                print(f"  n={n:>6}  t={bench(quicksort, data):.6f} c")
+                elapsed = bench(quicksort, data)
+                results[kind].append((n, elapsed))
+                print(f"  n={n:>6}  t={elapsed:.6f} c")
             except RecursionError:
                 # Аварийное завершение — тоже результат верификации:
                 # зафиксируйте его в отчёте вместе с размером входа.
+                results[kind].append((n, None))
                 print(f"  n={n:>6}  RecursionError")
     # TODO: сопоставить рост времени по классам входов с заявленной в docstring
     # TODO: оценкой O(n log n); объяснить наблюдаемую деградацию и её причину в коде.
+    return results
 
 
 # ---------------------------------------------------------------------------
@@ -227,7 +233,8 @@ def self_check() -> None:
 # 6. Графики
 # ---------------------------------------------------------------------------
 
-def plot_results(results: dict, out_dir: Path, version: str) -> None:
+def plot_results(results: dict[str, list[tuple[int, float | None]]],
+                 out_dir: Path, version: str) -> None:
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -248,11 +255,18 @@ def plot_results(results: dict, out_dir: Path, version: str) -> None:
 
     for kind, points in results.items():
         valid_points = [(n, t) for n, t in points if t is not None]
+        if not valid_points:
+            continue
 
         ns = [n for n, t in valid_points]
         ts = [t for n, t in valid_points]
 
         ax.plot(ns, ts, marker="o", label=names[kind])
+
+    if not ax.lines:
+        plt.close(fig)
+        print("График не построен: нет успешных замеров")
+        return
 
     ax.set_xscale("log")
     ax.set_yscale("log")
@@ -291,6 +305,7 @@ def main() -> None:
     run_representative_tests(rng)          # шаги 1–2
     compare_with_reference(rng, runs=300)  # шаг 3
     results = run_benchmarks(seed)         # шаг 4
+    plot_results(results, Path("."), "fixed")
 
     # TODO: по итогам шагов 1–4 сформулировать в отчёте вердикт о применимости
     # TODO: (принять / принять с доработкой / отклонить), исправить дефекты в копии
